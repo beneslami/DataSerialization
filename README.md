@@ -30,3 +30,12 @@ Data Serialization/deserialization is all about removing and adding padding byte
 | StructureName  |     Serialization Routine     |   Deserialization Routine   |
 |----------------|-------------------------------|-----------------------------|
 |  Person_t      |void serialize_person_t(person_t \*obj, ser_buff_t \*b);|person_t* de_serialize_person_t(ser_buff_t* b);|          |  Company_t     |void serialize_company_t(company_t \*obj, ser_buff_t \*b);|company_t* de_serialize_company_t(ser_buff_t* b);|
+
+
+```mermaid
+graph LR
+A[Internal Data] ----> B[Serializer] ----> C[Serialized Data]
+D[Compiler] ----> C
+C ----> E((Send Over the Network)) ----> F[Deserializer] ----> H[Internal Data]
+G[Compiler] ----> F
+
