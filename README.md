@@ -34,9 +34,12 @@ Data Serialization/deserialization is all about removing and adding padding byte
 
 ```mermaid
 digraph LR{
-A[Internal Data] ----> B[Serializer] ----> C[Serialized Data]
-D[Compiler] ----> C
-C ----> E((Send Over the Network)) ----> F[Deserializer] ----> H[Internal Data]
-G[Compiler] ----> F
+InternalData -> Serializer;
+Serializer -> SerializedData;
+Compiler -> SerializedData;
+SerializedData -> Send_Over_the_Network;
+Send_Over_the_Network -> Deserializer;
+Compiler -> Deserializer;
+Deserializer -> InternalData;
 }
 ``` 
