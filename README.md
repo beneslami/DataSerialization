@@ -38,5 +38,5 @@ A[Internal Data] ----> B[Serializer] ----> C[Serialized Data]
 D[Compiler] ----> C
 C ----> E((Send Over the Network)) ----> F[Deserializer] ----> H[Internal Data]
 G[Compiler] ----> F
-```
+``` 
 
