@@ -25,7 +25,7 @@ Data Serialization is done in 3 condition:
 
 Data Serialization/deserialization is all about removing and adding padding bytes in the data structure memory footprint with the help of **Compiler**. So, it's important to know that the compiler involves in both processes and the programmer does not explicitly add the padding bytes.
 
-StructureName |  Serialization Routine  | Deserialization Routine
+|StructureName |  Serialization Routine  | Deserialization Routine
 -----------------------------------------------------------------
     Person_t  |  void serialize_person_t          | person_t*
               | (person_t \*obj, ser_buff_t \*b); |  de_serialize_person_t(ser_buff_t* b);
