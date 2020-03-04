@@ -33,17 +33,10 @@ Data Serialization/deserialization is all about removing and adding padding byte
 
 
 ```mermaid
-graph LR
+digraph LR{
 A[Internal Data] ----> B[Serializer] ----> C[Serialized Data]
 D[Compiler] ----> C
 C ----> E((Send Over the Network)) ----> F[Deserializer] ----> H[Internal Data]
 G[Compiler] ----> F
+}
 ``` 
-
-```mermaid
-graph LR
-A[Square Rect] -- Link text --> B((Circle))
-A --> C(Round Rect)
-B --> D{Rhombus}
-C --> D
-```
