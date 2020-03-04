@@ -31,4 +31,6 @@ Data Serialization/deserialization is all about removing and adding padding byte
 |----------------|-------------------------------|-----------------------------|
 |  Person_t      |void serialize_person_t(person_t \*obj, ser_buff_t \*b);|person_t* de_serialize_person_t(ser_buff_t* b);|          |  Company_t     |void serialize_company_t(company_t \*obj, ser_buff_t \*b);|company_t* de_serialize_company_t(ser_buff_t* b);|
 
+For every structure, we need to perform its serialization on sending process and deserialization on receiving process. Serialized data is a flat structure which means it contains no pointers, no padding bytes or any hierarchical metadata.
 
+There is a data structure called **STREAM** which makes the use of serialization of data easy. It is useful in situation when there is a need to collect or append data one after another incrementally just like OSI layer headers in a packet one after another. 
