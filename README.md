@@ -49,4 +49,37 @@ void init_serialized_buffer(ser_buff_t **data){
   (*data)->size = SERIALIZE_BUFFER_DEFAULT_SIZE;
   (*data)->next = 0;
 }
+.
+.
+.
+ Usage:
+ser_buff_t *stream;
+init_serialized_buffer(&stream);
 ```
+![picture](data/serialized.png)
+
+After invoking ```init_serialized_buffer```, there is a serialized buffer which is in its initial state created. The pointer points to the beginning of the buffer and ```next``` indicates that new data should be added right after that.
+
+Further step is to add data into a serialized buffer. Below you can see functions and APIs to do such thing:
+```
+void serialize_data(ser_buff_t *buff, char *data, int nbytes){
+  int available_size = buff->size - buff->next;
+  char isResize = 0;
+  while(available_size < nbytes){
+    buff->size = buff->size*2;
+    available_size = buff->size - buff->next;
+    isResize = 1;
+  }
+  if(isResize == 0){
+    memcpy((char*)buff->data + buff->next, data, nbytes);
+    buff->next += nbytes;
+    return;
+  }
+  buff->data = realloc(buff->data, buff->size);
+  memcpy((char*)buff->data + buff->next, data, nbytes);
+  buff->next += nbytes;
+}
+```
+![picture](data/serialized2.png)
+
+Note that, ```realloc()``` changes the size of the memory while preserving the content of it. So if the size of the new data to be added is more than available space (```available_size```), then the function doubles the buffer size and preserves the previous data and then adds new data in a serialized manner.
