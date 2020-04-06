@@ -83,3 +83,21 @@ void serialize_data(ser_buff_t *buff, char *data, int nbytes){
 ![picture](data/serialized2.png)
 
 Note that, ```realloc()``` changes the size of the memory while preserving the content of it. So if the size of the new data to be added is more than available space (```available_size```), then the function doubles the buffer size and preserves the previous data and then adds new data in a serialized manner.
+
+How to read data from serialized buffer?
+
+There should be a de-serializer API. You should know that in receiver side, for the first time it receives serialized data, ```next``` pointer points to the beginning of the serial buffer.  
+```
+void de_serialize_data(char *dest, ser_buff_t *data, int size){
+  memcpy(dest, data->data, size);
+  data->next += size;
+}
+```
+If a program wants to skip specific bytes in serialized buffer, below piece of code is doing this:
+```
+void  serialize_buffer_skip(ser_buff_t *data, int skip_size){
+  if(data->next + skip_size > 0 && data->next + skip_size < data->size)
+    data->next += skip_size;
+}
+```
+It is important to note that, after finish working with serialized buffer, we need to free it, otherwise there will be memory leak.
