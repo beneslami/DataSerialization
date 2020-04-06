@@ -4,17 +4,19 @@ Data (De)Serialization
 **Data Serialization** is a mechanism to transform the program's internal data structure into a form that could be sent to a remote machine over the network.
 **Data (De)Serialization** helps in making data exchange between processes running on heterogeneous machines independent of underlying OS, Compiler, Programming Language, Hardware and the like.
 
->struct student_t {
+```
+struct student_t {
   char name[30];
   int id;
   int no;
-}
+};
+```
 
 The memory layout for the above code is way more different in different architectures. So, without data (de)Serialization, it is impossible to have communication between heterogeneous machines.
 
 Note that, Data (De)Serialization is one of the most important building block of various system programming concepts such as: RPC, State Synchronization, Check Pointing the application state.
 
-Data Serialization deletes pads compiler adds in data structures. In the above code, the memory layout of the structure is somehow different with the its actual memory footprint. There are nested structures in some programs which contains pointer to the child's structure. In this case, when the data is serialized, the pointer is translated to 0xF...FF . This is called **Sentinel** value. During deserialization, when we encounter the Sentinel value in the serialized object, we know that this field was set to NULL in the original object.
+Data Serialization deletes data structures pads in which compiler adds. In the above code, the memory layout of the structure is somehow different with the its actual memory footprint. There are nested structures in some programs which contains pointer to the child's structure. In this case, when the data is serialized, the pointer is translated to 0xF...FF . This is called **Sentinel** value. During deserialization, when we encounter the Sentinel value in the serialized object, we know that this field was set to NULL in the original object.
 Data Serialization is done in 3 condition:
 
 1) Simple C structures
@@ -25,7 +27,7 @@ Data Serialization is done in 3 condition:
 
 Data Serialization/deserialization is all about removing and adding padding bytes in the data structure memory footprint with the help of **Compiler**. So, it's important to know that the compiler involves in both processes and the programmer does not explicitly add the padding bytes.
 
- 
+
 
 | StructureName  |     Serialization Routine     |   Deserialization Routine   |
 |----------------|-------------------------------|-----------------------------|
@@ -33,4 +35,18 @@ Data Serialization/deserialization is all about removing and adding padding byte
 
 For every structure, we need to perform its serialization on sending process and deserialization on receiving process. Serialized data is a flat structure which means it contains no pointers, no padding bytes or any hierarchical metadata.
 
-There is a data structure called **STREAM** which makes the use of serialization of data easy. It is useful in situation when there is a need to collect or append data one after another incrementally just like OSI layer headers in a packet one after another. 
+There is a data structure called **STREAM** which makes use of serialization of data easy. It is useful in situation when there is a need to collect or append data one after another incrementally just like OSI layer headers in a packet one after another. It helps in copying the bytes into a buffer, as well as reading the bytes from the buffer very easy and handy. This data structure is a flexible buffer which grows automatically when run out of space. The below piece of codes are an example of serializing and de-serializing data:
+```
+typedef struc serialized_buffer{
+  char *data; //points to the start of the memory buffer which stores the content
+  int size; //size of the serialized buffer
+  int next; //bytes position in serialized buffer where next data item will be written into or read from.
+}ser_buff_t;
+
+void init_serialized_buffer(ser_buff_t **data){
+  (*data) = (ser_buff_t*)calloc(1, sizeof(ser_buff_t));
+  (*data)->data = calloc(1, SERIALIZE_BUFFER_DEFAULT_SIZE); //Let's say 100
+  (*data)->size = SERIALIZE_BUFFER_DEFAULT_SIZE;
+  (*data)->next = 0;
+}
+```
