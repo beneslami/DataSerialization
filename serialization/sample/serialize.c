@@ -60,18 +60,18 @@ char
 }
 
 void
-serialize_buffer_skip(ser_buff_t *b, unsigned int size){
-  int available_size = b->size - *(b->next);
+serialize_buffer_skip(ser_buff_t *b, unsigned long size){
+  int available_size = b->size - (int)(b->next);
 
   if(available_size >= size){
-    *(b->next) += size;
+    b->next += size;
     return;
   }
   if(available_size < size){
       b->size = b->size*2;
-      available_size = b->size - *(b->next);
+      available_size = b->size - (int)(b->next);
       b->b = realloc(b->b, b->size);
-      *(b->next) = *(b->next) + size;
+      b->next = (int)(b->next) + size;
   }
 }
 
@@ -90,25 +90,26 @@ serialize_data(ser_buff_t *b, char *data, int nbytes){
     printf("%s(): Error\n", __FUNCTION__);
 		return;
   }
-  ser_buff_t *buff = (ser_buff_t*)(b);
-  int available_size = buff->size - *(buff->next);
+
+  ser_buff_t *buff = b;
+  int available_size = buff->size - (int)(buff->next);
   char isResize = 0;
 
   while(available_size < nbytes){
     buff->size = buff->size * 2;
-    available_size = buff->size - *(buff->next);
+    available_size = buff->size - (int)(buff->next);
     isResize = 1;
   }
 
   if(isResize == 0){
-    memcpy((char*)buff->b + *(buff->next), data, nbytes);
-    b->next += nbytes;
+    memcpy((char*)buff->b + (int)(buff->next), data, nbytes);
+    b->next = (int)b->next + nbytes;
     return;
   }
 
   buff->b = realloc(buff->b, buff->size);
-  memcpy((char*)buff->b + *(buff->next), data, nbytes);
-  b->next += nbytes;
+  memcpy((char*)buff->b + (int)(buff->next), data, nbytes);
+  b->next = (int)b->next + nbytes;
   return;
 }
 
@@ -116,10 +117,10 @@ void
 de_serialize_data(char *dest, ser_buff_t *b, int size){
   if(!b || !b->b) assert(0);
   if(!size) return;
-  if((b->size - *(b->next)) < size) assert(0);
+  if((b->size - (int)(b->next)) < size) assert(0);
 
   memcpy(dest, b->b, size);
-  *(b->next) += size;
+  b->next += size;
 }
 
 void

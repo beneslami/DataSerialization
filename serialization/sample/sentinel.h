@@ -15,7 +15,7 @@
   unsigned int sentinel = 0;                                      \
   de_serialize_data((char*)&sentinel, b, sizeof(unsigned int));   \
   if(sentinel == 0xFFFFFFFF)  return NULL;                        \
-  serialize_buffer_skip(b, (-1) * sizeof(unsigned int));              \
+  serialize_buffer_skip(b, (-1) * sizeof(unsigned int));          \
 }
 
 #endif

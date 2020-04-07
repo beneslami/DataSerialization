@@ -3,24 +3,8 @@
 #include "serialize.h"
 #include <string.h>
 #include <stdlib.h>
-
-struct company_ {
-  char comp_name[30];
-  int emp_strength;
-  person_t *CEO;
-};
-
-struct person_{
-  unsigned int vehicle_nos[4];
-  int age;
-  int *height;
-  unsigned int *last_salary_amounts[5];
-  char name[30];
-  company_t company; /* embedded structure */
-  company_t dream_companies[3];
-  struct person_ *CEO; /* pointer structure */
-  struct person_ *administrative_staff[5];
-};
+#include <stdio.h>
+#include <memory.h>
 
 void
 serialize_person_t(person_t *obj, ser_buff_t *b) {
@@ -84,8 +68,9 @@ de_serialize_person_t(ser_buff_t *b){
   code.
   *
   sentinel detection code */
-  SENTINEL_DETECTION_CODE(b);
 
+  SENTINEL_DETECTION_CODE(b);
+  printf("here\n");                                               
   person_t *obj = calloc(1, sizeof(person_t));
 
   for(loop_var = 0; loop_var < 4; loop_var++){
