@@ -164,7 +164,7 @@ void serialized_person_t(person_t *obj, ser_buffer_t *b){
 ## The Implementation of Data De-Serialization
 straight to the point!
 ```
-person_t de_serializer_person_t(ser_buffer_t *b){
+person_t *de_serializer_person_t(ser_buffer_t *b){
   /* sentinel detection code */
   unsigned int sentinel = 0;
   de_serialize_data((char*)&sentinel, b, sizeof(unsigned int));
@@ -172,6 +172,116 @@ person_t de_serializer_person_t(ser_buffer_t *b){
     return NULL;
   }
   serialize_buffer_skip(b, -1 * sizeof(unsigned int));
-  
+
+  /* de-serialization routine */
+  person_t *obj = calloc(1, sizeof(person_t));
+  de_serialize_data((char*)obj->name, b, sizeof(char)*strlen(obj->name));
+  de_serialize_data((char*)&obj->age, b, sizeof(int));
+  de_serialize_data((char*)&obj->weight, b, sizeof(int));
+  return obj;
 }
 ```
+The program should check if the first 4 bytes of the serialized buffer is ```0xFFFFFFFF```, and if so, the function should return ```NULL```. Otherwise, the function must turn the ```next``` pointer back to the first place with the invocation of ```serialize_buffer_skip``` function. After this stage, we are sure that the serialized buffer is not null and ```de_serializer_person_t``` must start de-serialization routine.
+
+De-Serialization conventions:
+
+1. For a given structure S, signature of deserializer routine will be :
+```
+S* de_serialize_S(ser_buffer_t *b);
+```
+2. The de_serialize_data should be written as:
+```
+de_serialize_data((char*)&obj-><Field Name>, b, sizeof(Field Data Type)); /* if field is not an array */
+de_serialize_data((char*)obj-><Field Name>, b, sizeof(Field Data Type)*array_size; /* if field is an array */
+```
+
+**De-Serializing Nested Structures**:
+According to below data structure, deserialization function will be as below:
+```
+struct person_t{
+  char name[30];
+  int age;
+  struct occupation_t occ;
+  int weight;
+};
+
+struct occupation_t{
+  char dept_name[30];
+  char employee_code;
+};
+
+person_t *de_serializer_person_t(ser_buff_t *b){
+  /* sentinel detection code */
+  unsigned int sentinel = 0;
+  de_serialize_data((char*)&sentinel, b, sizeof(unsigned int));
+  if(sentinel == 0xFFFFFFFF){
+    return NULL;
+  }
+  serialize_buffer_skip(b, -1 * sizeof(unsigned int));
+
+  person_t *obj = calloc(1, sizeof(person_t));
+  de_serialize_data((char*)obj->name, b, sizeof(char)*strlen(obj->name));
+  de_serialize_data((char*)&obj->age, b, sizeof(int));
+  struct occupation_t *occ = de_serialized_occupation_t(b);
+  obj->occ = occ; /* shallow copy. No need to copy each element, if any. */
+  free(occ); // shallow free
+  de_serialize_data((char*)&obj->weight, b, sizeof(int));
+  return obj;
+}
+```
+**De-Serializing Pointer Structures**:
+```
+struct person_t{
+  char name[30];
+  int age;
+  struct occupation_t *occ;
+  int weight;
+};
+
+struct occupation_t{
+  char dept_name[30];
+  char employee_code;
+};
+
+person_t *de_serializer_person_t(ser_buff_t *b){
+  /* sentinel detection code */
+  unsigned int sentinel = 0;
+  de_serialize_data((char*)&sentinel, b, sizeof(unsigned int));
+  if(sentinel == 0xFFFFFFFF){
+    return NULL;
+  }
+  serialize_buffer_skip(b, -1 * sizeof(unsigned int));
+
+  person_t *obj = calloc(1, sizeof(person_t));
+  de_serialize_data((char*)obj->name, b, sizeof(char)*strlen(obj->name));
+  de_serialize_data((char*)&obj->age, b, sizeof(int));
+  obj->occ = de_serialized_occupation_t(b);
+  de_serialize_data((char*)&obj->weight, b, sizeof(int));
+  return obj;
+```
+The main pitfall in this system is de-serialization part. In fact, de-serialization function is not able to distinguish between these two data structures:
+
+1. When the pointer member of the parent structure is NULL.
+```
+struct person_t{
+  char name[30];
+  int age;
+  struct occupation_t *occ = NULL;
+  int weight;
+};
+```
+2. When the first member of the nested structure is NULL.
+```
+struct person_t{
+  char name[30];
+  int age;
+  struct occupation_t *occ;
+  int weight;
+};
+struct occupation_t{
+  struct work_ext_t = NULL;
+  char office_address[30];
+};
+```
+
+The solution is that the first member of the internal object (pointed by pointer member field) should not be pointer member. So, Avoid it. 
