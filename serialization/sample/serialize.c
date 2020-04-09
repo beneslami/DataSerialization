@@ -27,36 +27,36 @@ init_serialized_buffer_of_defined_size(ser_buff_t **b, int size){
   (*b)->next = 0;
 }
 
-char
+int
 is_serialized_buffer_empty(ser_buff_t *b){
-  if(b->next == 0)
+  if((int)(b->next) == 0)
       return 1;
   return 0;
 }
 
 int
 get_serialize_buffer_size(ser_buff_t *b){
-  return *(b->next);
-}
-
-int
-get_serialize_buffer_length(ser_buff_t *b){
   return b->size;
 }
 
 int
-get_serialize_buffer_current_ptr_offset(ser_buff_t *b){
+*get_serialize_buffer_length(ser_buff_t *b){
+  return (int)(b->next);
+}
+
+int
+*get_serialize_buffer_current_ptr_offset(ser_buff_t *b){
   if(!b){
     return -1;
   }
-  return *(b->next);
+  return (int)(b->next);
 }
 
 char
 *get_serialize_buffer_current_ptr(ser_buff_t *b){
   if(!b)
     return NULL;
-  return (char*)b->b + *(b->next);
+  return (char*)b->b + (int)(b->next);
 }
 
 void
@@ -64,15 +64,16 @@ serialize_buffer_skip(ser_buff_t *b, unsigned long size){
   int available_size = b->size - (int)(b->next);
 
   if(available_size >= size){
-    b->next += size;
+    b->next =(int)(b->next) + size;
     return;
   }
-  if(available_size < size){
-      b->size = b->size*2;
+  while(available_size < size){
+      b->size = b->size * 2;
       available_size = b->size - (int)(b->next);
       b->b = realloc(b->b, b->size);
-      b->next = (int)(b->next) + size;
   }
+  b->next = (int)(b->next) + size;
+  return;
 }
 
 void
@@ -103,13 +104,13 @@ serialize_data(ser_buff_t *b, char *data, int nbytes){
 
   if(isResize == 0){
     memcpy((char*)buff->b + (int)(buff->next), data, nbytes);
-    b->next = (int)b->next + nbytes;
+    b->next = (int)(b->next) + nbytes;
     return;
   }
 
   buff->b = realloc(buff->b, buff->size);
-  memcpy((char*)buff->b + (int)(buff->next), data, nbytes);
-  b->next = (int)b->next + nbytes;
+  memcpy((char*)buff->b + *(buff->next), data, nbytes);
+  b->next = (int)(b->next) + nbytes;
   return;
 }
 
@@ -120,7 +121,7 @@ de_serialize_data(char *dest, ser_buff_t *b, int size){
   if((b->size - (int)(b->next)) < size) assert(0);
 
   memcpy(dest, b->b, size);
-  b->next += size;
+  b->next = (int)(b->next) + size;
 }
 
 void
@@ -132,9 +133,9 @@ free_serialize_buffer(ser_buff_t *b){
 void
 truncate_serialize_buffer(ser_buff_t **b){
     ser_buff_t *clone = NULL;
-    if((*(*b)->next) == (*b)->size)  return;
-    init_serialized_buffer_of_defined_size(&clone, (*(*b)->next));
-    memcpy(clone->b, (*b)->b, (*(*b)->next));
+    if((*b)->next == (*b)->size)  return;
+    init_serialized_buffer_of_defined_size(&clone, (*b)->next);
+    memcpy(clone->b, (*b)->b, (*b)->next);
     clone->next = &clone->size;
     free_serialize_buffer(*b);
     *b =clone;
@@ -142,12 +143,13 @@ truncate_serialize_buffer(ser_buff_t **b){
 
 void
 reset_serialize_buffer(ser_buff_t *b){
-    b->next = 0;
+  b->next = 0;
 }
 
 void
-print_buffer_details(ser_buff_t *b, const char *fn, int lineno){
-  printf("%s():%d : starting address = 0x%x\n", fn, lineno, (unsigned int)b);
+print_buffer_details(ser_buff_t *b){
+  printf("%lu\n", strlen(b->b));
+  printf("%s\n", (char*)b->b);
   printf("size = %d\n", b->size);
-  printf("next = %d\n", *(b->next));
+  printf("next = %d\n", (int)(b->next));
 }

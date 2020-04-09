@@ -84,22 +84,23 @@ int main(int argc, char **argv){
     p1.company.CEO = NULL;
 
     printf("printing the object to be serialized on sending machine\n\n");
-    print_person(&p1);
+    //print_person(&p1);
+
 
     ser_buff_t *b;
     init_serialized_buffer(&b);
 
-    serialize_person_t (&p1, b);
+    //serialize_person_t(&p1, b);
+    //print_buffer_details(b);
+    //reset_serialize_buffer(b);
 
-    reset_serialize_buffer(b);
+    //person_t *p2 = de_serialize_person_t(b);
 
-    person_t *p2 = de_serialize_person_t(b);
-    
-    free_serialize_buffer(b);
-    b = NULL;
+    //free_serialize_buffer(b);
+    //b = NULL;
 
-    printf("\nprinting the deserialized object on recieving machine\n\n");
-    print_person(p2);
+    //printf("\nprinting the deserialized object on recieving machine\n\n");
+    //print_person(p2);
 
     return 0;
 }
