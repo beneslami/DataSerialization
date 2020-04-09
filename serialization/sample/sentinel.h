@@ -1,10 +1,10 @@
 #ifndef SENTINEL_H
 #define SENTINEL_H
 
-#define SENTINEL_INSERTION_CODE(obj, b)                           \
+#define SENTINEL_INSERTION_CODE(obj)                              \
 {                                                                 \
     if(!obj){                                                     \
-      serialize_data(b, "0xFFFFFFFF", sizeof(unsigned int));      \
+      serialize_data(b, "0xFFFFFFFF", strlen("0xFFFFFFFF"));      \
       return;                                                     \
     }                                                             \
 }

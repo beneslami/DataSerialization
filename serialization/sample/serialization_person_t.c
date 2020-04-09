@@ -1,7 +1,6 @@
 #include "person_t.h"
 #include "sentinel.h"
 #include "serialize.h"
-#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <memory.h>
@@ -16,44 +15,45 @@ serialize_person_t(person_t *obj, ser_buff_t *b) {
   *
   *
   * sentinel insertion code ... */
-  SENTINEL_INSERTION_CODE(obj, b);
+  SENTINEL_INSERTION_CODE(obj);
 
-  for(loop_var = 0; loop_var < 4; loop_var++){
+  for(loop_var = 0; loop_var < 4; loop_var++){  /* serialize 16 bytes */
     char tmp[10];
     sprintf(tmp, "%d", obj->vehicle_nos[loop_var]);
     serialize_data(b, tmp, sizeof(unsigned int));
   }
   char temp[10];
   sprintf(temp, "%d", obj->age);
-  serialize_data(b, temp, sizeof(int));
+  serialize_data(b, temp, sizeof(int)); /* serialize 4 bytes */
 
   if(obj->height){
     char tmp[10];
-    sprintf(tmp, "%d", *obj->height);
-    serialize_data(b, tmp, sizeof(int));
+    sprintf(tmp, "%d", *(obj->height));
+    serialize_data(b, tmp, sizeof(int)); /* serialize 4 bytes */
+
   }
   else{
-    serialize_data(b, "0xFFFFFFFF", sizeof(unsigned int));
+    serialize_data(b, "0xFFFFFFFF", strlen("0xFFFFFFFF")); /* serialize 10 bytes */
   }
 
-  for(loop_var = 0; loop_var < 5; loop_var++){
+  for(loop_var = 0; loop_var < 5; loop_var++){ /* serialize 20 bytes */
     if(obj->last_salary_amounts[loop_var]){
       char tmp[10];
       sprintf(tmp, "%d", *(obj->last_salary_amounts[loop_var]));
       serialize_data(b, tmp, sizeof(unsigned int));
     }
     else{
-      serialize_data(b, "0xFFFFFFFF", sizeof(unsigned int));
+      serialize_data(b, "0xFFFFFFFF", strlen("0xFFFFFFFF")); /* serialize 10 bytes */
     }
   }
 
-  serialize_data(b, (char*)obj->name, sizeof(char)*strlen(obj->name));
+  serialize_data(b, (char*)obj->name, 30); /* serialize 30 bytes */
 
   serialize_company_t(&obj->company, b);
 
   serialize_person_t(obj->CEO, b);
 
-  for(loop_var = 0; loop_var < 5; loop_var++){
+  for(loop_var = 0; loop_var < 5; loop_var++){   /* serialize 50 bytes */
     serialize_person_t(obj->administrative_staff[loop_var], b);
   }
 }
@@ -61,17 +61,17 @@ serialize_person_t(person_t *obj, ser_buff_t *b) {
 void
 serialize_company_t(company_t *obj, ser_buff_t *b){
 
-  SENTINEL_INSERTION_CODE(obj, b);
+  SENTINEL_INSERTION_CODE(obj);
 
   if(obj->comp_name){
-      serialize_data(b, (char*)obj->comp_name, sizeof(char)*strlen(obj->comp_name));
+      serialize_data(b, (char*)obj->comp_name, 30); /* serialize 30 bytes */
   }
   else{
-      serialize_data(b, "0xFFFFFFFF", sizeof(unsigned int));
+      serialize_data(b, "0xFFFFFFFF", strlen("0xFFFFFFFF")); /* serialize 10 bytes */
   }
   char tmp[10];
   sprintf(tmp, "%d", obj->emp_strength);
-  serialize_data(b, tmp, sizeof(int));
+  serialize_data(b, tmp, sizeof(int)); /* serialize 4 bytes */
 
   serialize_person_t(obj->CEO, b);
 }

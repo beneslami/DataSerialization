@@ -3,12 +3,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+static int counter = 0;
 
 struct ser_buff_ {
   #define SERIALIZE_BUFFER_DEFAULT_SIZE 512
   void *b;
   int size;
-  int *next;
+  int next;
 };
 
 void
@@ -16,6 +17,7 @@ init_serialized_buffer(ser_buff_t **b){
   (*b) = (ser_buff_t*)calloc(1, sizeof(ser_buff_t));
   (*b)->b  = calloc(1, SERIALIZE_BUFFER_DEFAULT_SIZE);
   (*b)->size = SERIALIZE_BUFFER_DEFAULT_SIZE;
+  (*b)->next = (int)calloc(1, sizeof(int));
   (*b)->next = 0;
 }
 
@@ -24,12 +26,13 @@ init_serialized_buffer_of_defined_size(ser_buff_t **b, int size){
   (*b) = (ser_buff_t*)calloc(1, sizeof(ser_buff_t));
   (*b)->b = calloc(1, size);
   (*b)->size = size;
+  (*b)->next = (int)calloc(1, sizeof(int));
   (*b)->next = 0;
 }
 
 int
 is_serialized_buffer_empty(ser_buff_t *b){
-  if((int)(b->next) == 0)
+  if(b->next == 0)
       return 1;
   return 0;
 }
@@ -40,39 +43,39 @@ get_serialize_buffer_size(ser_buff_t *b){
 }
 
 int
-*get_serialize_buffer_length(ser_buff_t *b){
-  return (int)(b->next);
+get_serialize_buffer_length(ser_buff_t *b){
+  return b->next;
 }
 
 int
-*get_serialize_buffer_current_ptr_offset(ser_buff_t *b){
+get_serialize_buffer_current_ptr_offset(ser_buff_t *b){
   if(!b){
     return -1;
   }
-  return (int)(b->next);
+  return b->next;
 }
 
 char
 *get_serialize_buffer_current_ptr(ser_buff_t *b){
   if(!b)
     return NULL;
-  return (char*)b->b + (int)(b->next);
+  return (char*)b->b + b->next;
 }
 
 void
 serialize_buffer_skip(ser_buff_t *b, unsigned long size){
-  int available_size = b->size - (int)(b->next);
+  int available_size = b->size - b->next;
 
   if(available_size >= size){
-    b->next =(int)(b->next) + size;
+    b->next = b->next + size;
     return;
   }
   while(available_size < size){
       b->size = b->size * 2;
-      available_size = b->size - (int)(b->next);
+      available_size = b->size - b->next;
       b->b = realloc(b->b, b->size);
   }
-  b->next = (int)(b->next) + size;
+  b->next = b->next + size;
   return;
 }
 
@@ -87,28 +90,28 @@ copy_in_serialized_buffer_by_offset(ser_buff_t *b, int size, char *value, int of
 
 void
 serialize_data(ser_buff_t *b, char *data, int nbytes){
-  if(!b){
-    printf("%s(): Error\n", __FUNCTION__);
-		return;
-  }
-  ser_buff_t *buff = b;
-  int available_size = buff->size - (int)(buff->next);
+
+  if (b == NULL) assert(0);
+
+  ser_buff_t *buff = (ser_buff_t *)(b);
+  int available_size = buff->size - buff->next;
   char isResize = 0;
+
   while(available_size < nbytes){
-    buff->size = buff->size * 2;
-    available_size = buff->size - (int)(buff->next);
-    isResize = 1;
+      buff->size = buff->size * 2;
+      available_size = buff->size - buff->next;
+      isResize = 1;
   }
 
   if(isResize == 0){
-    memcpy((char*)buff->b + (int)(buff->next), data, nbytes);
-    b->next = (int)(b->next) + nbytes;
-    return;
+      memcpy((char *)buff->b + buff->next, data, nbytes);
+      buff->next = buff->next + nbytes;
+      return;
   }
-
+  // resize of the buffer
   buff->b = realloc(buff->b, buff->size);
-  memcpy((char*)buff->b + *(buff->next), data, nbytes);
-  b->next = (int)(b->next) + nbytes;
+  memcpy((char *)buff->b + buff->next, data, nbytes);
+  buff->next = buff->next + nbytes;
   return;
 }
 
@@ -116,10 +119,10 @@ void
 de_serialize_data(char *dest, ser_buff_t *b, int size){
   if(!b || !b->b) assert(0);
   if(!size) return;
-  if((b->size - (int)(b->next)) < size) assert(0);
+  if((b->size - b->next) < size) assert(0);
 
   memcpy(dest, b->b, size);
-  b->next = (int)(b->next) + size;
+  b->next = b->next + size;
 }
 
 void
@@ -134,7 +137,7 @@ truncate_serialize_buffer(ser_buff_t **b){
     if((*b)->next == (*b)->size)  return;
     init_serialized_buffer_of_defined_size(&clone, (*b)->next);
     memcpy(clone->b, (*b)->b, (*b)->next);
-    clone->next = &clone->size;
+    clone->next = clone->size;
     free_serialize_buffer(*b);
     *b =clone;
 }
@@ -146,8 +149,8 @@ reset_serialize_buffer(ser_buff_t *b){
 
 void
 print_buffer_details(ser_buff_t *b){
-  printf("%d\n", strlen(b->b));
+  printf("%lu\n", strlen(b->b));
   printf("%s\n", (char*)b->b);
   printf("size = %d\n", b->size);
-  printf("next = %d\n", (int)(b->next));
+  printf("next = %d\n", b->next);
 }

@@ -60,30 +60,30 @@ int main(int argc, char **argv){
     person_t p1;
     memset(&p1, 0, sizeof(person_t));
 
-    p1.vehicle_nos[0] = 1000;
-    p1.vehicle_nos[1] = 1001;
-    p1.vehicle_nos[2] = 1002;
-    p1.vehicle_nos[3] = 1003;
-    p1.age = 31;
+    p1.vehicle_nos[0] = 1000; //4
+    p1.vehicle_nos[1] = 1001; //4
+    p1.vehicle_nos[2] = 1002; //4
+    p1.vehicle_nos[3] = 1003; //4
+    p1.age = 27;              //4
     p1.height = calloc(1, sizeof(int));
-    *p1.height = 167;
-    p1.last_salary_amounts[0] = NULL;
-    p1.last_salary_amounts[1] = NULL;
+    *p1.height = 176;         //4
+    p1.last_salary_amounts[0] = NULL; //10
+    p1.last_salary_amounts[1] = NULL; //10
     p1.last_salary_amounts[2] = calloc(1, sizeof(unsigned int));
-    *p1.last_salary_amounts[2] = 20000;
+    *p1.last_salary_amounts[2] = 20000; //4
     p1.last_salary_amounts[3] = calloc(1, sizeof(unsigned int));
-    *p1.last_salary_amounts[3] = 40000;
-    p1.last_salary_amounts[4] = NULL;
-    strncpy(p1.name, "Benyamin", strlen("Benyamin"));
-    strncpy(p1.company.comp_name, "CISCO", strlen("CISCO"));
-    p1.company.emp_strength = 10000;
-    p1.company.CEO = NULL;
-    p1.CEO = NULL;
-    p1.administrative_staff[0] = NULL;
-    p1.administrative_staff[1] = NULL;
-    p1.administrative_staff[2] = NULL;
-    p1.administrative_staff[3] = NULL;
-    p1.administrative_staff[4] = NULL;
+    *p1.last_salary_amounts[3] = 40000; //4
+    p1.last_salary_amounts[4] = NULL;  //10
+    strncpy(p1.name, "Benyamin", strlen("Benyamin"));  //8
+    strncpy(p1.company.comp_name, "CISCO", strlen("CISCO"));  //5
+    p1.company.emp_strength = 10000; //5
+    p1.company.CEO = NULL; //10
+    p1.CEO = NULL;          //10
+    p1.administrative_staff[0] = NULL; //10
+    p1.administrative_staff[1] = NULL;  //10
+    p1.administrative_staff[2] = NULL;  //10
+    p1.administrative_staff[3] = NULL;   //10
+    p1.administrative_staff[4] = NULL;  //10
     //printf("printing the object to be serialized on sending machine\n\n");
     //print_person(&p1);
 
@@ -91,6 +91,7 @@ int main(int argc, char **argv){
     init_serialized_buffer(&b);
 
     serialize_person_t(&p1, b);
+
     print_buffer_details(b);
     //reset_serialize_buffer(b);
 
