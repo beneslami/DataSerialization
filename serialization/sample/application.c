@@ -39,10 +39,6 @@ print_person(person_t *obj){
     printf("name = %s\n", obj->name);
     print_company(&obj->company);
 
-    for(loop_var = 0; loop_var < 3; loop_var++){
-        print_company(&obj->dream_companies[loop_var]);
-    }
-
     print_person(obj->CEO);
 
     for(loop_var = 0; loop_var < 5; loop_var++){
@@ -78,20 +74,24 @@ int main(int argc, char **argv){
     p1.last_salary_amounts[3] = calloc(1, sizeof(unsigned int));
     *p1.last_salary_amounts[3] = 40000;
     p1.last_salary_amounts[4] = NULL;
-    strncpy(p1.name, "Abhishek", strlen("Abhishek"));
-    strncpy(p1.company.comp_name, "Juniper", strlen("Juniper"));
+    strncpy(p1.name, "Benyamin", strlen("Benyamin"));
+    strncpy(p1.company.comp_name, "CISCO", strlen("CISCO"));
     p1.company.emp_strength = 10000;
     p1.company.CEO = NULL;
-
-    printf("printing the object to be serialized on sending machine\n\n");
+    p1.CEO = NULL;
+    p1.administrative_staff[0] = NULL;
+    p1.administrative_staff[1] = NULL;
+    p1.administrative_staff[2] = NULL;
+    p1.administrative_staff[3] = NULL;
+    p1.administrative_staff[4] = NULL;
+    //printf("printing the object to be serialized on sending machine\n\n");
     //print_person(&p1);
-
 
     ser_buff_t *b;
     init_serialized_buffer(&b);
 
-    //serialize_person_t(&p1, b);
-    //print_buffer_details(b);
+    serialize_person_t(&p1, b);
+    print_buffer_details(b);
     //reset_serialize_buffer(b);
 
     //person_t *p2 = de_serialize_person_t(b);

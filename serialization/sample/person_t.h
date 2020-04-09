@@ -17,7 +17,6 @@ struct person_{
   unsigned int *last_salary_amounts[5];
   char name[30];
   company_t company; /* embedded structure */
-  company_t dream_companies[3];
   struct person_ *CEO; /* pointer structure */
   struct person_ *administrative_staff[5];
 };

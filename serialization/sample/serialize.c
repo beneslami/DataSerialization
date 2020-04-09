@@ -91,11 +91,9 @@ serialize_data(ser_buff_t *b, char *data, int nbytes){
     printf("%s(): Error\n", __FUNCTION__);
 		return;
   }
-
   ser_buff_t *buff = b;
   int available_size = buff->size - (int)(buff->next);
   char isResize = 0;
-
   while(available_size < nbytes){
     buff->size = buff->size * 2;
     available_size = buff->size - (int)(buff->next);
@@ -148,7 +146,7 @@ reset_serialize_buffer(ser_buff_t *b){
 
 void
 print_buffer_details(ser_buff_t *b){
-  printf("%lu\n", strlen(b->b));
+  printf("%d\n", strlen(b->b));
   printf("%s\n", (char*)b->b);
   printf("size = %d\n", b->size);
   printf("next = %d\n", (int)(b->next));

@@ -19,30 +19,37 @@ serialize_person_t(person_t *obj, ser_buff_t *b) {
   SENTINEL_INSERTION_CODE(obj, b);
 
   for(loop_var = 0; loop_var < 4; loop_var++){
-    serialize_data(b, (char*)&obj->vehicle_nos[loop_var], sizeof(unsigned int));
+    char tmp[10];
+    sprintf(tmp, "%d", obj->vehicle_nos[loop_var]);
+    serialize_data(b, tmp, sizeof(unsigned int));
+  }
+  char temp[10];
+  sprintf(temp, "%d", obj->age);
+  serialize_data(b, temp, sizeof(int));
+
+  if(obj->height){
+    char tmp[10];
+    sprintf(tmp, "%d", *obj->height);
+    serialize_data(b, tmp, sizeof(int));
+  }
+  else{
+    serialize_data(b, "0xFFFFFFFF", sizeof(unsigned int));
   }
 
-  serialize_data(b, (char*)&obj->age, sizeof(int));
-
-  if(obj->height)
-    serialize_data(b, (char*)obj->height, sizeof(int));
-  else
-    serialize_data(b, (char*)&sentinel, sizeof(unsigned int));
-
   for(loop_var = 0; loop_var < 5; loop_var++){
-    if(obj->last_salary_amounts[loop_var])
-      serialize_data(b, (char*)obj->last_salary_amounts[loop_var], sizeof(unsigned int));
-    else
-      serialize_data(b, (char*)&sentinel, sizeof(unsigned int));
+    if(obj->last_salary_amounts[loop_var]){
+      char tmp[10];
+      sprintf(tmp, "%d", *(obj->last_salary_amounts[loop_var]));
+      serialize_data(b, tmp, sizeof(unsigned int));
+    }
+    else{
+      serialize_data(b, "0xFFFFFFFF", sizeof(unsigned int));
+    }
   }
 
   serialize_data(b, (char*)obj->name, sizeof(char)*strlen(obj->name));
 
   serialize_company_t(&obj->company, b);
-
-  for(loop_var = 0; loop_var < 3; loop_var++){
-    serialize_company_t(&obj->dream_companies[loop_var], b);
-  }
 
   serialize_person_t(obj->CEO, b);
 
@@ -53,10 +60,19 @@ serialize_person_t(person_t *obj, ser_buff_t *b) {
 
 void
 serialize_company_t(company_t *obj, ser_buff_t *b){
+
   SENTINEL_INSERTION_CODE(obj, b);
 
-  serialize_data(b, (char*)obj->comp_name, sizeof(char)*strlen(obj->comp_name));
-  serialize_data(b, (char*)&obj->emp_strength, sizeof(int));
+  if(obj->comp_name){
+      serialize_data(b, (char*)obj->comp_name, sizeof(char)*strlen(obj->comp_name));
+  }
+  else{
+      serialize_data(b, "0xFFFFFFFF", sizeof(unsigned int));
+  }
+  char tmp[10];
+  sprintf(tmp, "%d", obj->emp_strength);
+  serialize_data(b, tmp, sizeof(int));
+
   serialize_person_t(obj->CEO, b);
 }
 
@@ -66,11 +82,9 @@ de_serialize_person_t(ser_buff_t *b){
   unsigned int sentinel = 0;
   /* for envery de_serialization routine, always first insert sentinel detection
   code.
-  *
   sentinel detection code */
-
   SENTINEL_DETECTION_CODE(b);
-  printf("here\n");                                               
+
   person_t *obj = calloc(1, sizeof(person_t));
 
   for(loop_var = 0; loop_var < 4; loop_var++){
@@ -103,17 +117,19 @@ de_serialize_person_t(ser_buff_t *b){
     }
   }
 
-  de_serialize_data((char*)obj->name, b, sizeof(char)*strlen(obj->name));
+  de_serialize_data((char*)obj->name, b, 30);
+  printf("here\n");
 
   company_t *company = de_serialize_company_t(b);
+
   obj->company = *company; /* shallow copy */
   free(company); /* shallow free */
 
-  for(loop_var = 0; loop_var < 3; loop_var++){
+  /*for(loop_var = 0; loop_var < 3; loop_var++){
     company_t *company = de_serialize_company_t(b);
     obj->dream_companies[loop_var] = *company; /* shallow copy */
-    free(company); /* shallow free */
-  }
+    //free(company); /* shallow free */
+  //}
 
   obj->CEO = de_serialize_person_t(b);
 
