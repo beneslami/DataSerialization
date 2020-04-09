@@ -28,9 +28,8 @@ serialize_person_t(person_t *obj, ser_buff_t *b) {
 
   if(obj->height){
     char tmp[10];
-    sprintf(tmp, "%d", *(obj->height));
+    sprintf(tmp, "%d", *obj->height);
     serialize_data(b, tmp, sizeof(int)); /* serialize 4 bytes */
-
   }
   else{
     serialize_data(b, "0xFFFFFFFF", strlen("0xFFFFFFFF")); /* serialize 10 bytes */

@@ -104,14 +104,15 @@ serialize_data(ser_buff_t *b, char *data, int nbytes){
   }
 
   if(isResize == 0){
-      memcpy((char *)buff->b + buff->next, data, nbytes);
-      buff->next = buff->next + nbytes;
-      return;
+    printf("%d\n", buff->next);
+    memcpy((char *)buff->b + buff->next , data, nbytes);
+    buff->next += nbytes;
+    return;
   }
   // resize of the buffer
   buff->b = realloc(buff->b, buff->size);
   memcpy((char *)buff->b + buff->next, data, nbytes);
-  buff->next = buff->next + nbytes;
+  buff->next += nbytes;
   return;
 }
 
