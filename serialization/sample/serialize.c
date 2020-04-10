@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-static int counter = 0;
 
 struct ser_buff_ {
   #define SERIALIZE_BUFFER_DEFAULT_SIZE 512
@@ -17,7 +16,6 @@ init_serialized_buffer(ser_buff_t **b){
   (*b) = (ser_buff_t*)calloc(1, sizeof(ser_buff_t));
   (*b)->b  = calloc(1, SERIALIZE_BUFFER_DEFAULT_SIZE);
   (*b)->size = SERIALIZE_BUFFER_DEFAULT_SIZE;
-  (*b)->next = (int)calloc(1, sizeof(int));
   (*b)->next = 0;
 }
 
@@ -26,7 +24,6 @@ init_serialized_buffer_of_defined_size(ser_buff_t **b, int size){
   (*b) = (ser_buff_t*)calloc(1, sizeof(ser_buff_t));
   (*b)->b = calloc(1, size);
   (*b)->size = size;
-  (*b)->next = (int)calloc(1, sizeof(int));
   (*b)->next = 0;
 }
 
@@ -75,7 +72,7 @@ serialize_buffer_skip(ser_buff_t *b, unsigned long size){
       available_size = b->size - b->next;
       b->b = realloc(b->b, b->size);
   }
-  b->next = b->next + size;
+  b->next += size;
   return;
 }
 
@@ -104,7 +101,6 @@ serialize_data(ser_buff_t *b, char *data, int nbytes){
   }
 
   if(isResize == 0){
-    printf("%d\n", buff->next);
     memcpy((char *)buff->b + buff->next , data, nbytes);
     buff->next += nbytes;
     return;
@@ -123,7 +119,7 @@ de_serialize_data(char *dest, ser_buff_t *b, int size){
   if((b->size - b->next) < size) assert(0);
 
   memcpy(dest, b->b, size);
-  b->next = b->next + size;
+  b->next +=  size;
 }
 
 void
@@ -140,7 +136,7 @@ truncate_serialize_buffer(ser_buff_t **b){
     memcpy(clone->b, (*b)->b, (*b)->next);
     clone->next = clone->size;
     free_serialize_buffer(*b);
-    *b =clone;
+    *b = clone;
 }
 
 void
@@ -150,8 +146,7 @@ reset_serialize_buffer(ser_buff_t *b){
 
 void
 print_buffer_details(ser_buff_t *b){
-  printf("%lu\n", strlen(b->b));
-  printf("%s\n", (char*)b->b);
+  printf("size = %s\n", (char*)b->b);
   printf("size = %d\n", b->size);
   printf("next = %d\n", b->next);
 }

@@ -88,7 +88,7 @@ int main(int argc, char **argv){
     //print_person(&p1);
 
     ser_buff_t *b;
-    init_serialized_buffer(&b);
+    init_serialized_buffer_of_defined_size(&b, 512);
 
     serialize_person_t(&p1, b);
 
