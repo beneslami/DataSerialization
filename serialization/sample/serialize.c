@@ -60,9 +60,8 @@ char
 }
 
 void
-serialize_buffer_skip(ser_buff_t *b, unsigned long size){
+serialize_buffer_skip(ser_buff_t *b, int size){
   int available_size = b->size - b->next;
-
   if(available_size >= size){
     b->next = b->next + size;
     return;
@@ -117,8 +116,7 @@ de_serialize_data(char *dest, ser_buff_t *b, int size){
   if(!b || !b->b) assert(0);
   if(!size) return;
   if((b->size - b->next) < size) assert(0);
-
-  memcpy(dest, b->b, size);
+  memcpy(dest, b->b + b->next, size);
   b->next +=  size;
 }
 
@@ -146,7 +144,6 @@ reset_serialize_buffer(ser_buff_t *b){
 
 void
 print_buffer_details(ser_buff_t *b){
-  printf("size = %s\n", (char*)b->b);
   printf("size = %d\n", b->size);
   printf("next = %d\n", b->next);
 }

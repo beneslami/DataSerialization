@@ -15,7 +15,7 @@ serialize_person_t(person_t *obj, ser_buff_t *b) {
   *
   *
   * sentinel insertion code ... */
-  SENTINEL_INSERTION_CODE(obj);
+  SENTINEL_INSERTION_CODE(obj, b);
 
   for(loop_var = 0; loop_var < 4; loop_var++){  /* serialize 16 bytes */
     /*char tmp[10];
@@ -64,7 +64,7 @@ serialize_person_t(person_t *obj, ser_buff_t *b) {
 void
 serialize_company_t(company_t *obj, ser_buff_t *b){
 
-  SENTINEL_INSERTION_CODE(obj);
+  SENTINEL_INSERTION_CODE(obj, b);
 
   serialize_data(b, (char *)obj->comp_name, 30);
   serialize_data(b, (char *)&obj->emp_strength, sizeof(int));
@@ -78,6 +78,7 @@ de_serialize_person_t(ser_buff_t *b){
   /* for envery de_serialization routine, always first insert sentinel detection
   code.
   sentinel detection code */
+
   SENTINEL_DETECTION_CODE(b);
 
   person_t *obj = calloc(1, sizeof(person_t));
@@ -113,25 +114,16 @@ de_serialize_person_t(ser_buff_t *b){
   }
 
   de_serialize_data((char*)obj->name, b, 30);
-  printf("here\n");
 
   company_t *company = de_serialize_company_t(b);
-
   obj->company = *company; /* shallow copy */
   free(company); /* shallow free */
-
-  /*for(loop_var = 0; loop_var < 3; loop_var++){
-    company_t *company = de_serialize_company_t(b);
-    obj->dream_companies[loop_var] = *company; /* shallow copy */
-    //free(company); /* shallow free */
-  //}
 
   obj->CEO = de_serialize_person_t(b);
 
   for(loop_var = 0; loop_var < 5; loop_var++){
     obj->administrative_staff[loop_var] = de_serialize_person_t(b);
   }
-
   return obj;
 }
 
@@ -141,9 +133,8 @@ de_serialize_company_t(ser_buff_t *b){
   SENTINEL_DETECTION_CODE(b);
   company_t *obj = calloc(1, sizeof(company_t));
 
-  de_serialize_data((char*)obj->comp_name, b, sizeof(char)*strlen(obj->comp_name));
+  de_serialize_data((char*)obj->comp_name, b, 30);
   de_serialize_data((char*)&obj->emp_strength, b, sizeof(int));
   obj->CEO = de_serialize_person_t(b);
-
   return obj;
 }
