@@ -3,6 +3,6 @@
 #include "serialize.h"
 #include "linkedlist.h"
 void serialize_linkedlist(table_t*, ser_buff_t*);
-void de_serialize_linkedlist(ser_buff_t *, table_t *);
+table_t *de_serialize_linkedlist(ser_buff_t *);
 
 #endif

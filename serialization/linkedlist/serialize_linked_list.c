@@ -1,7 +1,7 @@
+#include <stdio.h>
 #include "serialize.h"
 #include "linkedlist.h"
 #include "serialize_linked_list.h"
-#include <stdio.h>
 
 void
 serialize_linkedlist(table_t *table, ser_buff_t *b){
@@ -15,11 +15,12 @@ serialize_linkedlist(table_t *table, ser_buff_t *b){
   serialize_data(b, (char*)&sentinel, sizeof(unsigned int)); // mark the tail
 }
 
-void
-de_serialize_linkedlist(ser_buff_t *b, table_t *table){
+table_t
+*de_serialize_linkedlist(ser_buff_t *b){
   int i = 1;
+  table_t *table;
+  table = init();
   unsigned int sentinel = 0;
-
   while(i){
     de_serialize_data((char*)&sentinel, b, sizeof(unsigned int));
     if(sentinel == 0xFFFFFFFF){
@@ -31,4 +32,5 @@ de_serialize_linkedlist(ser_buff_t *b, table_t *table){
       add(table, i);
     }
   }
+  return table;
 }

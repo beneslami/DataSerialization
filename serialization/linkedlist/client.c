@@ -37,19 +37,18 @@ int main(int argc, char **argv){
   add(table, 4);
   add(table, 5);
 
-  /* creating serialized buffer */
-  ser_buff_t *b;
-  init_serialized_buffer_of_defined_size(&b, 64);
-
-  /* serialization routine */
-  serialize_linkedlist(table, b);
-  print_buffer_detail(b);
-  /* send serialized buffer to the server */
-  ret = write(data_socket, b, get_serialize_buffer_length(b));
-  if(ret == -1){
-    perror("write");
-    exit(EXIT_FAILURE);
+  table_entry_t *node = table->next;
+  while(node){
+    ret = write(data_socket, &node->data, sizeof(int));
+    if(ret == -1){
+      perror("write");
+      exit(EXIT_FAILURE);
+    }
+    node = node->next;
   }
+  int finish = -1;
+  ret = write(data_socket, &finish, sizeof(int));
+  
   /* wait for the result */
   ret = read(data_socket, &result, sizeof(int));
   if(ret == -1){

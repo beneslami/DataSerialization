@@ -16,12 +16,7 @@ int main (int argc, char **argv){
   int ret;
   int connection_socket;
   int data_socket;
-  int result;
-
-  ser_buff_t *b;
-  init_serialized_buffer_of_defined_size(&b, 128);
-  table_t *table;
-  table = init();
+  int result = 0;
 
   /* socket routine */
   unlink(SOCEKT_NAME);
@@ -43,29 +38,23 @@ int main (int argc, char **argv){
     perror("listen");
     exit(EXIT_FAILURE);
   }
+
   for(;;){
     data_socket = accept(connection_socket, NULL, NULL);
     if(data_socket == -1){
       perror("accpet");
       exit(EXIT_FAILURE);
     }
-
-    ret = read(data_socket, b, 128);
-    serialize_reset_buffer(b);
-    print_buffer_detail(b);
-    /* de-serialization routine */
-    de_serialize_linkedlist(b, table);
-
-    result = add_linked_list_item(table);
-
-    ret = write(data_socket, &result, sizeof(int));
-    if(ret == -1){
-      perror("write");
-      exit(EXIT_FAILURE);
+    int i = 0;
+    while(1){
+        ret = read(data_socket, &i, sizeof(int));
+        if(i == -1) break;
+        result += i;
     }
+    ret = write(data_socket, &result, sizeof(int));
     close(data_socket);
+    result = 0;
   }
   close(connection_socket);
-  free(table);
   return 0;
 }

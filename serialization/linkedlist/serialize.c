@@ -23,30 +23,28 @@ void
 serialize_buffer_skip(ser_buff_t *b, int size){
   int available_size = b->size - b->next;
   if(available_size >= size){
-    b->next += size;
+    b->next = b->next + size;
     return;
   }
   while(available_size < size){
-    b->size *= 2;
+    b->size = b->size * 2;
     available_size = b->size - b->next;
+    b->b = realloc(b->b, b->size);
   }
-  b->b = realloc(b->b, b->size);
   b->next += size;
   return;
-
 }
 
 void
 serialize_data(ser_buff_t *b, char *data, int nbytes){
   if(b == NULL) assert(0);
-
   ser_buff_t *buff = b;
-  int available_size = b->size - b->next;
+  int available_size = buff->size - buff->next;
   int isResize = 0;
 
   while(available_size < nbytes){
-    b->size *= 2;
-    available_size = b->size - b->next;
+    buff->size *= 2;
+    available_size = buff->size - buff->next;
     isResize = 1;
   }
   if(isResize == 0){
@@ -87,6 +85,9 @@ get_serialize_buffer_length(ser_buff_t *b){
 
 void
 print_buffer_detail(ser_buff_t *b){
+  if(!b || !b->b) {
+    assert(0);
+  }
   printf("%d\n", b->size);
   printf("%d\n", b->next);
 }
