@@ -6,10 +6,11 @@
 #include <sys/un.h>
 #include <sys/socket.h>
 #include "linkedlist.h"
+#include "serialize.h"
+#include "serialize_linked_list.h"
 
 #define SOCEKT_NAME "/tmp/socket"
 
-table_t *table;
 int main (int argc, char **argv){
   struct sockaddr_un name;
   int ret;
@@ -17,13 +18,10 @@ int main (int argc, char **argv){
   int data_socket;
   int result;
 
-  /* creating linked list */
+  ser_buff_t *b;
+  init_serialized_buffer_of_defined_size(&b, 128);
+  table_t *table;
   table = init();
-  add(table, 1);
-  add(table, 2);
-  add(table, 3);
-  add(table, 4);
-  add(table, 5);
 
   /* socket routine */
   unlink(SOCEKT_NAME);
@@ -51,12 +49,15 @@ int main (int argc, char **argv){
       perror("accpet");
       exit(EXIT_FAILURE);
     }
-    int i;
-    ret = read(data_socket, &i, sizeof(int));
-    printf("%d\n", i);
-    /* de-serialization routine */
 
-    result = i*10;;
+    ret = read(data_socket, b, 128);
+    serialize_reset_buffer(b);
+    print_buffer_detail(b);
+    /* de-serialization routine */
+    de_serialize_linkedlist(b, table);
+
+    result = add_linked_list_item(table);
+
     ret = write(data_socket, &result, sizeof(int));
     if(ret == -1){
       perror("write");

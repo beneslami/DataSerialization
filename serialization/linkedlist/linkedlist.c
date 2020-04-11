@@ -3,15 +3,6 @@
 #include <string.h>
 #include "linkedlist.h"
 
-struct table_entry_{
-	int data;
-	struct table_entry_ *next;
-};
-
-struct table_{
-	table_entry_t *next;
-};
-
 table_t
 *init(){
   table_t *table = (table_t*)calloc(1, sizeof(table_t));
@@ -83,4 +74,15 @@ del(table_t *table, table_entry_t *entry){
     current = current->next;
   }
   return -1;
+}
+
+int
+add_linked_list_item(table_t *table){
+	int result;
+	table_entry_t *node = table->next;
+	while(node){
+		result += node->data;
+		node = node->next;
+	}
+	return result;
 }
