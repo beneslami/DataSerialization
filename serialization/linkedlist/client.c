@@ -36,19 +36,13 @@ int main(int argc, char **argv){
   add(table, 3);
   add(table, 4);
   add(table, 5);
+  add(table, 6);
 
-  table_entry_t *node = table->next;
-  while(node){
-    ret = write(data_socket, &node->data, sizeof(int));
-    if(ret == -1){
-      perror("write");
-      exit(EXIT_FAILURE);
-    }
-    node = node->next;
-  }
-  int finish = -1;
-  ret = write(data_socket, &finish, sizeof(int));
-  
+  ser_buff_t *b;
+  init_serialized_buffer_of_defined_size(&b, 128);
+  serialize_linkedlist(table, b);
+  ret = write(data_socket, get_serialize_buffer(b), get_serialize_buffer_length(b));
+
   /* wait for the result */
   ret = read(data_socket, &result, sizeof(int));
   if(ret == -1){

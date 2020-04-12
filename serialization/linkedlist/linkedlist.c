@@ -77,8 +77,8 @@ del(table_t *table, table_entry_t *entry){
 }
 
 int
-add_linked_list_item(table_t *table){
-	int result;
+sum_linked_list_item(table_t *table){
+	int result = 0;
 	table_entry_t *node = table->next;
 	while(node){
 		result += node->data;

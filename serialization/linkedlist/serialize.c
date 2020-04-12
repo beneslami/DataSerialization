@@ -92,6 +92,17 @@ print_buffer_detail(ser_buff_t *b){
   printf("%d\n", b->next);
 }
 
-void serialize_reset_buffer(ser_buff_t *b){
+void
+serialize_reset_buffer(ser_buff_t *b){
   b->next = 0;
+}
+
+char
+*get_serialize_buffer(ser_buff_t* b){
+  return (char*)b->b;
+}
+
+void
+set_serialize_buffer(ser_buff_t *b, char *data, int nbytes){
+  memcpy((char*)b->b, data, nbytes);
 }

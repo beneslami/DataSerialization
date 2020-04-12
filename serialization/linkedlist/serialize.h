@@ -15,4 +15,6 @@ void print_buffer_detail(ser_buff_t *b);
 void buffer_copy(ser_buff_t *, char*, int);
 void serialize_reset_buffer(ser_buff_t*);
 
+char *get_serialize_buffer(ser_buff_t*);
+void set_serialize_buffer(ser_buff_t*, char*, int);
 #endif

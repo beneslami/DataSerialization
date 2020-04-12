@@ -45,12 +45,14 @@ int main (int argc, char **argv){
       perror("accpet");
       exit(EXIT_FAILURE);
     }
-    int i = 0;
-    while(1){
-        ret = read(data_socket, &i, sizeof(int));
-        if(i == -1) break;
-        result += i;
-    }
+    ser_buff_t *b;
+    init_serialized_buffer_of_defined_size(&b, 128);
+    char buffer[128];
+    ret = read(data_socket, buffer, 128);
+    set_serialize_buffer(b, buffer, ret);
+    serialize_reset_buffer(b);
+    table_t *table = de_serialize_linkedlist(b);
+    result = sum_linked_list_item(table);
     ret = write(data_socket, &result, sizeof(int));
     close(data_socket);
     result = 0;

@@ -7,8 +7,7 @@ void
 serialize_linkedlist(table_t *table, ser_buff_t *b){
   table_entry_t *head = table->next;
   while(head){
-    int temp = head->data;
-    serialize_data(b, (char*)&temp, sizeof(int));
+    serialize_data(b, (char*)&head->data, sizeof(int));
     head = head->next;
   }
   unsigned int sentinel = 0xFFFFFFFF;
@@ -21,7 +20,7 @@ table_t
   table_t *table;
   table = init();
   unsigned int sentinel = 0;
-  while(i){
+  while(1){
     de_serialize_data((char*)&sentinel, b, sizeof(unsigned int));
     if(sentinel == 0xFFFFFFFF){
       break;

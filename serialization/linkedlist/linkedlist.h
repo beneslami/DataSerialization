@@ -14,6 +14,6 @@ int add(table_t *, int);
 void show(table_t *);
 table_entry_t *find(table_t *, int);
 int del(table_t *, table_entry_t *);
-int add_linked_list_item(table_t*);
+int sum_linked_list_item(table_t*);
 
 #endif
