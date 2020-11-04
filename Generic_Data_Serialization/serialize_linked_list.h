@@ -1,0 +1,9 @@
+#ifndef SERIALIZE_LINKED_LIST_H
+#define SERIALIZE_LINKED_LIST_H
+
+#include "genericLinkedList.h"
+
+void serialize_linkedlist(table_t*, ser_buff_t*);
+table_t *de_serialize_linkedlist(ser_buff_t *);
+
+#endif
